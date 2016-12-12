@@ -1,5 +1,5 @@
 {
-    "aws_source_ami":    "ami-f95ef58a",
+    "aws_source_ami":    "ami-b22981d2",
     "aws_user":          "ubuntu",
     "distribution":      "ubuntu"
 }

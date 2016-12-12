@@ -1,0 +1,287 @@
+digraph {
+	compound = "true"
+	newrank = "true"
+	subgraph "root" {
+		"[root] aws_app_cookie_stickiness_policy.splunk" [label = "aws_app_cookie_stickiness_policy.splunk", shape = "box"]
+		"[root] aws_elb.search" [label = "aws_elb.search", shape = "box"]
+		"[root] aws_instance.deploymentserver" [label = "aws_instance.deploymentserver", shape = "box"]
+		"[root] aws_instance.indexer" [label = "aws_instance.indexer", shape = "box"]
+		"[root] aws_instance.master" [label = "aws_instance.master", shape = "box"]
+		"[root] aws_instance.searchhead" [label = "aws_instance.searchhead", shape = "box"]
+		"[root] aws_lb_cookie_stickiness_policy.search" [label = "aws_lb_cookie_stickiness_policy.search", shape = "box"]
+		"[root] aws_security_group.all" [label = "aws_security_group.all", shape = "box"]
+		"[root] aws_security_group.elb" [label = "aws_security_group.elb", shape = "box"]
+		"[root] aws_security_group.searchhead" [label = "aws_security_group.searchhead", shape = "box"]
+		"[root] aws_security_group_rule.interco" [label = "aws_security_group_rule.interco", shape = "box"]
+		"[root] consul_service.deploymentserver" [label = "consul_service.deploymentserver", shape = "box"]
+		"[root] consul_service.indexer" [label = "consul_service.indexer", shape = "box"]
+		"[root] consul_service.master" [label = "consul_service.master", shape = "box"]
+		"[root] consul_service.searchhead" [label = "consul_service.searchhead", shape = "box"]
+		"[root] module.consul.aws_instance.server" [label = "aws_instance.server", shape = "box"]
+		"[root] module.consul.aws_security_group.consul" [label = "aws_security_group.consul", shape = "box"]
+		"[root] module.consul.provider.aws" [label = "provider.aws", shape = "diamond"]
+		"[root] module.consul.provider.template" [label = "provider.template", shape = "diamond"]
+		"[root] module.consul.template_file.server_install" [label = "template_file.server_install", shape = "box"]
+		"[root] module.stack.module.bastion.aws_eip.bastion" [label = "aws_eip.bastion", shape = "box"]
+		"[root] module.stack.module.bastion.aws_instance.bastion" [label = "aws_instance.bastion", shape = "box"]
+		"[root] module.stack.module.bastion.provider.aws" [label = "provider.aws", shape = "diamond"]
+		"[root] module.stack.module.dhcp.aws_vpc_dhcp_options.dns_resolver" [label = "aws_vpc_dhcp_options.dns_resolver", shape = "box"]
+		"[root] module.stack.module.dhcp.aws_vpc_dhcp_options_association.dns_resolver" [label = "aws_vpc_dhcp_options_association.dns_resolver", shape = "box"]
+		"[root] module.stack.module.dhcp.provider.aws" [label = "provider.aws", shape = "diamond"]
+		"[root] module.stack.module.dns.aws_route53_zone.main" [label = "aws_route53_zone.main", shape = "box"]
+		"[root] module.stack.module.dns.provider.aws" [label = "provider.aws", shape = "diamond"]
+		"[root] module.stack.module.ecs_cluster.aws_autoscaling_group.main" [label = "aws_autoscaling_group.main", shape = "box"]
+		"[root] module.stack.module.ecs_cluster.aws_autoscaling_policy.scale_down" [label = "aws_autoscaling_policy.scale_down", shape = "box"]
+		"[root] module.stack.module.ecs_cluster.aws_autoscaling_policy.scale_up" [label = "aws_autoscaling_policy.scale_up", shape = "box"]
+		"[root] module.stack.module.ecs_cluster.aws_cloudwatch_metric_alarm.cpu_high" [label = "aws_cloudwatch_metric_alarm.cpu_high", shape = "box"]
+		"[root] module.stack.module.ecs_cluster.aws_cloudwatch_metric_alarm.cpu_low" [label = "aws_cloudwatch_metric_alarm.cpu_low", shape = "box"]
+		"[root] module.stack.module.ecs_cluster.aws_cloudwatch_metric_alarm.memory_high" [label = "aws_cloudwatch_metric_alarm.memory_high", shape = "box"]
+		"[root] module.stack.module.ecs_cluster.aws_cloudwatch_metric_alarm.memory_low" [label = "aws_cloudwatch_metric_alarm.memory_low", shape = "box"]
+		"[root] module.stack.module.ecs_cluster.aws_ecs_cluster.main" [label = "aws_ecs_cluster.main", shape = "box"]
+		"[root] module.stack.module.ecs_cluster.aws_launch_configuration.main" [label = "aws_launch_configuration.main", shape = "box"]
+		"[root] module.stack.module.ecs_cluster.aws_security_group.cluster" [label = "aws_security_group.cluster", shape = "box"]
+		"[root] module.stack.module.ecs_cluster.data.template_cloudinit_config.cloud_config" [label = "data.template_cloudinit_config.cloud_config", shape = "box"]
+		"[root] module.stack.module.ecs_cluster.data.template_file.ecs_cloud_config" [label = "data.template_file.ecs_cloud_config", shape = "box"]
+		"[root] module.stack.module.ecs_cluster.provider.aws" [label = "provider.aws", shape = "diamond"]
+		"[root] module.stack.module.ecs_cluster.provider.template" [label = "provider.template", shape = "diamond"]
+		"[root] module.stack.module.iam_role.aws_iam_instance_profile.default_ecs" [label = "aws_iam_instance_profile.default_ecs", shape = "box"]
+		"[root] module.stack.module.iam_role.aws_iam_role.default_ecs_role" [label = "aws_iam_role.default_ecs_role", shape = "box"]
+		"[root] module.stack.module.iam_role.aws_iam_role_policy.default_ecs_instance_role_policy" [label = "aws_iam_role_policy.default_ecs_instance_role_policy", shape = "box"]
+		"[root] module.stack.module.iam_role.aws_iam_role_policy.default_ecs_service_role_policy" [label = "aws_iam_role_policy.default_ecs_service_role_policy", shape = "box"]
+		"[root] module.stack.module.iam_role.provider.aws" [label = "provider.aws", shape = "diamond"]
+		"[root] module.stack.module.s3_logs.aws_s3_bucket.logs" [label = "aws_s3_bucket.logs", shape = "box"]
+		"[root] module.stack.module.s3_logs.data.template_file.policy" [label = "data.template_file.policy", shape = "box"]
+		"[root] module.stack.module.s3_logs.provider.aws" [label = "provider.aws", shape = "diamond"]
+		"[root] module.stack.module.s3_logs.provider.template" [label = "provider.template", shape = "diamond"]
+		"[root] module.stack.module.security_groups.aws_security_group.external_elb" [label = "aws_security_group.external_elb", shape = "box"]
+		"[root] module.stack.module.security_groups.aws_security_group.external_ssh" [label = "aws_security_group.external_ssh", shape = "box"]
+		"[root] module.stack.module.security_groups.aws_security_group.internal_elb" [label = "aws_security_group.internal_elb", shape = "box"]
+		"[root] module.stack.module.security_groups.aws_security_group.internal_ssh" [label = "aws_security_group.internal_ssh", shape = "box"]
+		"[root] module.stack.module.security_groups.provider.aws" [label = "provider.aws", shape = "diamond"]
+		"[root] module.stack.module.vpc.aws_eip.nat" [label = "aws_eip.nat", shape = "box"]
+		"[root] module.stack.module.vpc.aws_internet_gateway.main" [label = "aws_internet_gateway.main", shape = "box"]
+		"[root] module.stack.module.vpc.aws_nat_gateway.main" [label = "aws_nat_gateway.main", shape = "box"]
+		"[root] module.stack.module.vpc.aws_route.external" [label = "aws_route.external", shape = "box"]
+		"[root] module.stack.module.vpc.aws_route.internal" [label = "aws_route.internal", shape = "box"]
+		"[root] module.stack.module.vpc.aws_route_table.external" [label = "aws_route_table.external", shape = "box"]
+		"[root] module.stack.module.vpc.aws_route_table.internal" [label = "aws_route_table.internal", shape = "box"]
+		"[root] module.stack.module.vpc.aws_route_table_association.external" [label = "aws_route_table_association.external", shape = "box"]
+		"[root] module.stack.module.vpc.aws_route_table_association.internal" [label = "aws_route_table_association.internal", shape = "box"]
+		"[root] module.stack.module.vpc.aws_subnet.external" [label = "aws_subnet.external", shape = "box"]
+		"[root] module.stack.module.vpc.aws_subnet.internal" [label = "aws_subnet.internal", shape = "box"]
+		"[root] module.stack.module.vpc.aws_vpc.main" [label = "aws_vpc.main", shape = "box"]
+		"[root] module.stack.module.vpc.provider.aws" [label = "provider.aws", shape = "diamond"]
+		"[root] module.stack.provider.aws (disabled)" [label = "provider.aws (disabled)", shape = "diamond"]
+		"[root] module.stack.provider.template (disabled)" [label = "provider.template (disabled)", shape = "diamond"]
+		"[root] provider.aws" [label = "provider.aws", shape = "diamond"]
+		"[root] provider.consul" [label = "provider.consul", shape = "diamond"]
+		"[root] provider.template" [label = "provider.template", shape = "diamond"]
+		"[root] template_file.consul_agent_install" [label = "template_file.consul_agent_install", shape = "box"]
+		"[root] template_file.deploymentclient_conf" [label = "template_file.deploymentclient_conf", shape = "box"]
+		"[root] template_file.server_conf_indexer" [label = "template_file.server_conf_indexer", shape = "box"]
+		"[root] template_file.server_conf_master" [label = "template_file.server_conf_master", shape = "box"]
+		"[root] template_file.server_conf_searchhead" [label = "template_file.server_conf_searchhead", shape = "box"]
+		"[root] template_file.serverclass_conf" [label = "template_file.serverclass_conf", shape = "box"]
+		"[root] template_file.user_data_deploymentserver" [label = "template_file.user_data_deploymentserver", shape = "box"]
+		"[root] template_file.user_data_indexer" [label = "template_file.user_data_indexer", shape = "box"]
+		"[root] template_file.user_data_master" [label = "template_file.user_data_master", shape = "box"]
+		"[root] template_file.user_data_searchhead" [label = "template_file.user_data_searchhead", shape = "box"]
+		"[root] template_file.web_conf" [label = "template_file.web_conf", shape = "box"]
+		"[root] aws_app_cookie_stickiness_policy.splunk" -> "[root] aws_elb.search"
+		"[root] aws_app_cookie_stickiness_policy.splunk" -> "[root] provider.aws"
+		"[root] aws_elb.search" -> "[root] aws_instance.searchhead"
+		"[root] aws_elb.search" -> "[root] aws_security_group.elb"
+		"[root] aws_elb.search" -> "[root] module.stack.module.vpc.aws_subnet.external"
+		"[root] aws_elb.search" -> "[root] provider.aws"
+		"[root] aws_instance.deploymentserver" -> "[root] aws_security_group.all"
+		"[root] aws_instance.deploymentserver" -> "[root] module.stack.module.vpc.aws_subnet.external"
+		"[root] aws_instance.deploymentserver" -> "[root] provider.aws"
+		"[root] aws_instance.deploymentserver" -> "[root] template_file.consul_agent_install"
+		"[root] aws_instance.deploymentserver" -> "[root] template_file.user_data_deploymentserver"
+		"[root] aws_instance.indexer" -> "[root] aws_security_group.all"
+		"[root] aws_instance.indexer" -> "[root] module.stack.module.vpc.aws_subnet.external"
+		"[root] aws_instance.indexer" -> "[root] provider.aws"
+		"[root] aws_instance.indexer" -> "[root] template_file.consul_agent_install"
+		"[root] aws_instance.indexer" -> "[root] template_file.user_data_indexer"
+		"[root] aws_instance.master" -> "[root] aws_security_group.all"
+		"[root] aws_instance.master" -> "[root] module.stack.module.vpc.aws_subnet.external"
+		"[root] aws_instance.master" -> "[root] provider.aws"
+		"[root] aws_instance.master" -> "[root] template_file.consul_agent_install"
+		"[root] aws_instance.master" -> "[root] template_file.user_data_master"
+		"[root] aws_instance.searchhead" -> "[root] aws_security_group.all"
+		"[root] aws_instance.searchhead" -> "[root] module.stack.module.vpc.aws_subnet.external"
+		"[root] aws_instance.searchhead" -> "[root] provider.aws"
+		"[root] aws_instance.searchhead" -> "[root] template_file.consul_agent_install"
+		"[root] aws_instance.searchhead" -> "[root] template_file.user_data_searchhead"
+		"[root] aws_lb_cookie_stickiness_policy.search" -> "[root] aws_elb.search"
+		"[root] aws_lb_cookie_stickiness_policy.search" -> "[root] provider.aws"
+		"[root] aws_security_group.all" -> "[root] module.stack.module.vpc.aws_vpc.main"
+		"[root] aws_security_group.all" -> "[root] provider.aws"
+		"[root] aws_security_group.elb" -> "[root] module.stack.module.vpc.aws_vpc.main"
+		"[root] aws_security_group.elb" -> "[root] provider.aws"
+		"[root] aws_security_group.searchhead" -> "[root] aws_security_group.elb"
+		"[root] aws_security_group.searchhead" -> "[root] module.stack.module.vpc.aws_vpc.main"
+		"[root] aws_security_group.searchhead" -> "[root] provider.aws"
+		"[root] aws_security_group_rule.interco" -> "[root] aws_security_group.all"
+		"[root] aws_security_group_rule.interco" -> "[root] provider.aws"
+		"[root] consul_service.deploymentserver" -> "[root] aws_instance.deploymentserver"
+		"[root] consul_service.deploymentserver" -> "[root] provider.consul"
+		"[root] consul_service.indexer" -> "[root] aws_instance.indexer"
+		"[root] consul_service.indexer" -> "[root] provider.consul"
+		"[root] consul_service.master" -> "[root] aws_instance.master"
+		"[root] consul_service.master" -> "[root] provider.consul"
+		"[root] consul_service.searchhead" -> "[root] aws_instance.searchhead"
+		"[root] consul_service.searchhead" -> "[root] provider.consul"
+		"[root] module.consul.aws_instance.server" -> "[root] module.consul.aws_security_group.consul"
+		"[root] module.consul.aws_instance.server" -> "[root] module.consul.provider.aws"
+		"[root] module.consul.aws_instance.server" -> "[root] module.consul.template_file.server_install"
+		"[root] module.consul.aws_security_group.consul" -> "[root] module.consul.provider.aws"
+		"[root] module.consul.provider.aws" -> "[root] provider.aws"
+		"[root] module.consul.provider.template" -> "[root] provider.template"
+		"[root] module.consul.template_file.server_install" -> "[root] module.consul.provider.template"
+		"[root] module.stack.module.bastion.aws_eip.bastion" -> "[root] module.stack.module.bastion.aws_instance.bastion"
+		"[root] module.stack.module.bastion.aws_eip.bastion" -> "[root] module.stack.module.bastion.provider.aws"
+		"[root] module.stack.module.bastion.aws_instance.bastion" -> "[root] module.stack.module.bastion.provider.aws"
+		"[root] module.stack.module.bastion.aws_instance.bastion" -> "[root] module.stack.module.security_groups.aws_security_group.external_ssh"
+		"[root] module.stack.module.bastion.aws_instance.bastion" -> "[root] module.stack.module.security_groups.aws_security_group.internal_ssh"
+		"[root] module.stack.module.bastion.aws_instance.bastion" -> "[root] module.stack.module.vpc.aws_subnet.external"
+		"[root] module.stack.module.bastion.provider.aws" -> "[root] module.stack.provider.aws (disabled)"
+		"[root] module.stack.module.bastion.provider.aws" -> "[root] provider.aws"
+		"[root] module.stack.module.dhcp.aws_vpc_dhcp_options.dns_resolver" -> "[root] module.stack.module.dhcp.provider.aws"
+		"[root] module.stack.module.dhcp.aws_vpc_dhcp_options_association.dns_resolver" -> "[root] module.stack.module.dhcp.aws_vpc_dhcp_options.dns_resolver"
+		"[root] module.stack.module.dhcp.aws_vpc_dhcp_options_association.dns_resolver" -> "[root] module.stack.module.dhcp.provider.aws"
+		"[root] module.stack.module.dhcp.aws_vpc_dhcp_options_association.dns_resolver" -> "[root] module.stack.module.vpc.aws_vpc.main"
+		"[root] module.stack.module.dhcp.provider.aws" -> "[root] module.stack.provider.aws (disabled)"
+		"[root] module.stack.module.dhcp.provider.aws" -> "[root] provider.aws"
+		"[root] module.stack.module.dns.aws_route53_zone.main" -> "[root] module.stack.module.dns.provider.aws"
+		"[root] module.stack.module.dns.aws_route53_zone.main" -> "[root] module.stack.module.vpc.aws_vpc.main"
+		"[root] module.stack.module.dns.provider.aws" -> "[root] module.stack.provider.aws (disabled)"
+		"[root] module.stack.module.dns.provider.aws" -> "[root] provider.aws"
+		"[root] module.stack.module.ecs_cluster.aws_autoscaling_group.main" -> "[root] module.stack.module.ecs_cluster.aws_launch_configuration.main"
+		"[root] module.stack.module.ecs_cluster.aws_autoscaling_group.main" -> "[root] module.stack.module.ecs_cluster.provider.aws"
+		"[root] module.stack.module.ecs_cluster.aws_autoscaling_group.main" -> "[root] module.stack.module.vpc.aws_subnet.external"
+		"[root] module.stack.module.ecs_cluster.aws_autoscaling_group.main" -> "[root] module.stack.module.vpc.aws_subnet.internal"
+		"[root] module.stack.module.ecs_cluster.aws_autoscaling_policy.scale_down" -> "[root] module.stack.module.ecs_cluster.aws_autoscaling_group.main"
+		"[root] module.stack.module.ecs_cluster.aws_autoscaling_policy.scale_down" -> "[root] module.stack.module.ecs_cluster.provider.aws"
+		"[root] module.stack.module.ecs_cluster.aws_autoscaling_policy.scale_up" -> "[root] module.stack.module.ecs_cluster.aws_autoscaling_group.main"
+		"[root] module.stack.module.ecs_cluster.aws_autoscaling_policy.scale_up" -> "[root] module.stack.module.ecs_cluster.provider.aws"
+		"[root] module.stack.module.ecs_cluster.aws_cloudwatch_metric_alarm.cpu_high" -> "[root] module.stack.module.ecs_cluster.aws_autoscaling_policy.scale_up"
+		"[root] module.stack.module.ecs_cluster.aws_cloudwatch_metric_alarm.cpu_high" -> "[root] module.stack.module.ecs_cluster.aws_ecs_cluster.main"
+		"[root] module.stack.module.ecs_cluster.aws_cloudwatch_metric_alarm.cpu_high" -> "[root] module.stack.module.ecs_cluster.provider.aws"
+		"[root] module.stack.module.ecs_cluster.aws_cloudwatch_metric_alarm.cpu_low" -> "[root] module.stack.module.ecs_cluster.aws_autoscaling_policy.scale_down"
+		"[root] module.stack.module.ecs_cluster.aws_cloudwatch_metric_alarm.cpu_low" -> "[root] module.stack.module.ecs_cluster.aws_cloudwatch_metric_alarm.memory_high"
+		"[root] module.stack.module.ecs_cluster.aws_cloudwatch_metric_alarm.cpu_low" -> "[root] module.stack.module.ecs_cluster.aws_ecs_cluster.main"
+		"[root] module.stack.module.ecs_cluster.aws_cloudwatch_metric_alarm.cpu_low" -> "[root] module.stack.module.ecs_cluster.provider.aws"
+		"[root] module.stack.module.ecs_cluster.aws_cloudwatch_metric_alarm.memory_high" -> "[root] module.stack.module.ecs_cluster.aws_autoscaling_policy.scale_up"
+		"[root] module.stack.module.ecs_cluster.aws_cloudwatch_metric_alarm.memory_high" -> "[root] module.stack.module.ecs_cluster.aws_cloudwatch_metric_alarm.cpu_high"
+		"[root] module.stack.module.ecs_cluster.aws_cloudwatch_metric_alarm.memory_high" -> "[root] module.stack.module.ecs_cluster.aws_ecs_cluster.main"
+		"[root] module.stack.module.ecs_cluster.aws_cloudwatch_metric_alarm.memory_high" -> "[root] module.stack.module.ecs_cluster.provider.aws"
+		"[root] module.stack.module.ecs_cluster.aws_cloudwatch_metric_alarm.memory_low" -> "[root] module.stack.module.ecs_cluster.aws_autoscaling_policy.scale_down"
+		"[root] module.stack.module.ecs_cluster.aws_cloudwatch_metric_alarm.memory_low" -> "[root] module.stack.module.ecs_cluster.aws_cloudwatch_metric_alarm.cpu_low"
+		"[root] module.stack.module.ecs_cluster.aws_cloudwatch_metric_alarm.memory_low" -> "[root] module.stack.module.ecs_cluster.aws_ecs_cluster.main"
+		"[root] module.stack.module.ecs_cluster.aws_cloudwatch_metric_alarm.memory_low" -> "[root] module.stack.module.ecs_cluster.provider.aws"
+		"[root] module.stack.module.ecs_cluster.aws_ecs_cluster.main" -> "[root] module.stack.module.ecs_cluster.provider.aws"
+		"[root] module.stack.module.ecs_cluster.aws_launch_configuration.main" -> "[root] module.stack.module.ecs_cluster.aws_security_group.cluster"
+		"[root] module.stack.module.ecs_cluster.aws_launch_configuration.main" -> "[root] module.stack.module.ecs_cluster.data.template_cloudinit_config.cloud_config"
+		"[root] module.stack.module.ecs_cluster.aws_launch_configuration.main" -> "[root] module.stack.module.ecs_cluster.provider.aws"
+		"[root] module.stack.module.ecs_cluster.aws_launch_configuration.main" -> "[root] module.stack.module.iam_role.aws_iam_instance_profile.default_ecs"
+		"[root] module.stack.module.ecs_cluster.aws_security_group.cluster" -> "[root] module.stack.module.ecs_cluster.provider.aws"
+		"[root] module.stack.module.ecs_cluster.aws_security_group.cluster" -> "[root] module.stack.module.security_groups.aws_security_group.external_elb"
+		"[root] module.stack.module.ecs_cluster.aws_security_group.cluster" -> "[root] module.stack.module.security_groups.aws_security_group.internal_elb"
+		"[root] module.stack.module.ecs_cluster.aws_security_group.cluster" -> "[root] module.stack.module.security_groups.aws_security_group.internal_ssh"
+		"[root] module.stack.module.ecs_cluster.aws_security_group.cluster" -> "[root] module.stack.module.vpc.aws_vpc.main"
+		"[root] module.stack.module.ecs_cluster.data.template_cloudinit_config.cloud_config" -> "[root] module.stack.module.ecs_cluster.data.template_file.ecs_cloud_config"
+		"[root] module.stack.module.ecs_cluster.data.template_cloudinit_config.cloud_config" -> "[root] module.stack.module.ecs_cluster.provider.template"
+		"[root] module.stack.module.ecs_cluster.data.template_file.ecs_cloud_config" -> "[root] module.stack.module.ecs_cluster.provider.template"
+		"[root] module.stack.module.ecs_cluster.provider.aws" -> "[root] module.stack.provider.aws (disabled)"
+		"[root] module.stack.module.ecs_cluster.provider.aws" -> "[root] provider.aws"
+		"[root] module.stack.module.ecs_cluster.provider.template" -> "[root] module.stack.provider.template (disabled)"
+		"[root] module.stack.module.ecs_cluster.provider.template" -> "[root] provider.template"
+		"[root] module.stack.module.iam_role.aws_iam_instance_profile.default_ecs" -> "[root] module.stack.module.iam_role.aws_iam_role.default_ecs_role"
+		"[root] module.stack.module.iam_role.aws_iam_instance_profile.default_ecs" -> "[root] module.stack.module.iam_role.provider.aws"
+		"[root] module.stack.module.iam_role.aws_iam_role.default_ecs_role" -> "[root] module.stack.module.iam_role.provider.aws"
+		"[root] module.stack.module.iam_role.aws_iam_role_policy.default_ecs_instance_role_policy" -> "[root] module.stack.module.iam_role.aws_iam_role.default_ecs_role"
+		"[root] module.stack.module.iam_role.aws_iam_role_policy.default_ecs_instance_role_policy" -> "[root] module.stack.module.iam_role.provider.aws"
+		"[root] module.stack.module.iam_role.aws_iam_role_policy.default_ecs_service_role_policy" -> "[root] module.stack.module.iam_role.aws_iam_role.default_ecs_role"
+		"[root] module.stack.module.iam_role.aws_iam_role_policy.default_ecs_service_role_policy" -> "[root] module.stack.module.iam_role.provider.aws"
+		"[root] module.stack.module.iam_role.provider.aws" -> "[root] module.stack.provider.aws (disabled)"
+		"[root] module.stack.module.iam_role.provider.aws" -> "[root] provider.aws"
+		"[root] module.stack.module.s3_logs.aws_s3_bucket.logs" -> "[root] module.stack.module.s3_logs.data.template_file.policy"
+		"[root] module.stack.module.s3_logs.aws_s3_bucket.logs" -> "[root] module.stack.module.s3_logs.provider.aws"
+		"[root] module.stack.module.s3_logs.data.template_file.policy" -> "[root] module.stack.module.s3_logs.provider.template"
+		"[root] module.stack.module.s3_logs.provider.aws" -> "[root] module.stack.provider.aws (disabled)"
+		"[root] module.stack.module.s3_logs.provider.aws" -> "[root] provider.aws"
+		"[root] module.stack.module.s3_logs.provider.template" -> "[root] module.stack.provider.template (disabled)"
+		"[root] module.stack.module.s3_logs.provider.template" -> "[root] provider.template"
+		"[root] module.stack.module.security_groups.aws_security_group.external_elb" -> "[root] module.stack.module.security_groups.provider.aws"
+		"[root] module.stack.module.security_groups.aws_security_group.external_elb" -> "[root] module.stack.module.vpc.aws_vpc.main"
+		"[root] module.stack.module.security_groups.aws_security_group.external_ssh" -> "[root] module.stack.module.security_groups.provider.aws"
+		"[root] module.stack.module.security_groups.aws_security_group.external_ssh" -> "[root] module.stack.module.vpc.aws_vpc.main"
+		"[root] module.stack.module.security_groups.aws_security_group.internal_elb" -> "[root] module.stack.module.security_groups.provider.aws"
+		"[root] module.stack.module.security_groups.aws_security_group.internal_elb" -> "[root] module.stack.module.vpc.aws_vpc.main"
+		"[root] module.stack.module.security_groups.aws_security_group.internal_ssh" -> "[root] module.stack.module.security_groups.aws_security_group.external_ssh"
+		"[root] module.stack.module.security_groups.aws_security_group.internal_ssh" -> "[root] module.stack.module.security_groups.provider.aws"
+		"[root] module.stack.module.security_groups.aws_security_group.internal_ssh" -> "[root] module.stack.module.vpc.aws_vpc.main"
+		"[root] module.stack.module.security_groups.provider.aws" -> "[root] module.stack.provider.aws (disabled)"
+		"[root] module.stack.module.security_groups.provider.aws" -> "[root] provider.aws"
+		"[root] module.stack.module.vpc.aws_eip.nat" -> "[root] module.stack.module.vpc.provider.aws"
+		"[root] module.stack.module.vpc.aws_internet_gateway.main" -> "[root] module.stack.module.vpc.aws_vpc.main"
+		"[root] module.stack.module.vpc.aws_internet_gateway.main" -> "[root] module.stack.module.vpc.provider.aws"
+		"[root] module.stack.module.vpc.aws_nat_gateway.main" -> "[root] module.stack.module.vpc.aws_eip.nat"
+		"[root] module.stack.module.vpc.aws_nat_gateway.main" -> "[root] module.stack.module.vpc.aws_internet_gateway.main"
+		"[root] module.stack.module.vpc.aws_nat_gateway.main" -> "[root] module.stack.module.vpc.aws_subnet.external"
+		"[root] module.stack.module.vpc.aws_nat_gateway.main" -> "[root] module.stack.module.vpc.provider.aws"
+		"[root] module.stack.module.vpc.aws_route.external" -> "[root] module.stack.module.vpc.aws_internet_gateway.main"
+		"[root] module.stack.module.vpc.aws_route.external" -> "[root] module.stack.module.vpc.aws_route_table.external"
+		"[root] module.stack.module.vpc.aws_route.external" -> "[root] module.stack.module.vpc.provider.aws"
+		"[root] module.stack.module.vpc.aws_route.internal" -> "[root] module.stack.module.vpc.aws_nat_gateway.main"
+		"[root] module.stack.module.vpc.aws_route.internal" -> "[root] module.stack.module.vpc.aws_route_table.internal"
+		"[root] module.stack.module.vpc.aws_route.internal" -> "[root] module.stack.module.vpc.provider.aws"
+		"[root] module.stack.module.vpc.aws_route_table.external" -> "[root] module.stack.module.vpc.aws_vpc.main"
+		"[root] module.stack.module.vpc.aws_route_table.external" -> "[root] module.stack.module.vpc.provider.aws"
+		"[root] module.stack.module.vpc.aws_route_table.internal" -> "[root] module.stack.module.vpc.aws_vpc.main"
+		"[root] module.stack.module.vpc.aws_route_table.internal" -> "[root] module.stack.module.vpc.provider.aws"
+		"[root] module.stack.module.vpc.aws_route_table_association.external" -> "[root] module.stack.module.vpc.aws_route_table.external"
+		"[root] module.stack.module.vpc.aws_route_table_association.external" -> "[root] module.stack.module.vpc.aws_subnet.external"
+		"[root] module.stack.module.vpc.aws_route_table_association.external" -> "[root] module.stack.module.vpc.provider.aws"
+		"[root] module.stack.module.vpc.aws_route_table_association.internal" -> "[root] module.stack.module.vpc.aws_route_table.internal"
+		"[root] module.stack.module.vpc.aws_route_table_association.internal" -> "[root] module.stack.module.vpc.aws_subnet.internal"
+		"[root] module.stack.module.vpc.aws_route_table_association.internal" -> "[root] module.stack.module.vpc.provider.aws"
+		"[root] module.stack.module.vpc.aws_subnet.external" -> "[root] module.stack.module.vpc.aws_vpc.main"
+		"[root] module.stack.module.vpc.aws_subnet.external" -> "[root] module.stack.module.vpc.provider.aws"
+		"[root] module.stack.module.vpc.aws_subnet.internal" -> "[root] module.stack.module.vpc.aws_vpc.main"
+		"[root] module.stack.module.vpc.aws_subnet.internal" -> "[root] module.stack.module.vpc.provider.aws"
+		"[root] module.stack.module.vpc.aws_vpc.main" -> "[root] module.stack.module.vpc.provider.aws"
+		"[root] module.stack.module.vpc.provider.aws" -> "[root] module.stack.provider.aws (disabled)"
+		"[root] module.stack.module.vpc.provider.aws" -> "[root] provider.aws"
+		"[root] module.stack.provider.aws (disabled)" -> "[root] provider.aws"
+		"[root] module.stack.provider.template (disabled)" -> "[root] provider.template"
+		"[root] provider.consul" -> "[root] module.consul.aws_instance.server"
+		"[root] template_file.consul_agent_install" -> "[root] module.consul.aws_instance.server"
+		"[root] template_file.consul_agent_install" -> "[root] provider.template"
+		"[root] template_file.deploymentclient_conf" -> "[root] provider.template"
+		"[root] template_file.server_conf_indexer" -> "[root] aws_instance.master"
+		"[root] template_file.server_conf_indexer" -> "[root] provider.template"
+		"[root] template_file.server_conf_master" -> "[root] provider.template"
+		"[root] template_file.server_conf_searchhead" -> "[root] aws_instance.master"
+		"[root] template_file.server_conf_searchhead" -> "[root] provider.template"
+		"[root] template_file.serverclass_conf" -> "[root] aws_instance.master"
+		"[root] template_file.serverclass_conf" -> "[root] provider.template"
+		"[root] template_file.user_data_deploymentserver" -> "[root] provider.template"
+		"[root] template_file.user_data_deploymentserver" -> "[root] template_file.serverclass_conf"
+		"[root] template_file.user_data_deploymentserver" -> "[root] template_file.web_conf"
+		"[root] template_file.user_data_indexer" -> "[root] provider.template"
+		"[root] template_file.user_data_indexer" -> "[root] template_file.server_conf_indexer"
+		"[root] template_file.user_data_indexer" -> "[root] template_file.web_conf"
+		"[root] template_file.user_data_master" -> "[root] provider.template"
+		"[root] template_file.user_data_master" -> "[root] template_file.deploymentclient_conf"
+		"[root] template_file.user_data_master" -> "[root] template_file.server_conf_master"
+		"[root] template_file.user_data_master" -> "[root] template_file.web_conf"
+		"[root] template_file.user_data_searchhead" -> "[root] provider.template"
+		"[root] template_file.user_data_searchhead" -> "[root] template_file.deploymentclient_conf"
+		"[root] template_file.user_data_searchhead" -> "[root] template_file.server_conf_searchhead"
+		"[root] template_file.user_data_searchhead" -> "[root] template_file.web_conf"
+		"[root] template_file.web_conf" -> "[root] provider.template"
+	}
+}
+

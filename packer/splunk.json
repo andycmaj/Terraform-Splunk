@@ -1,7 +1,7 @@
 {
     "variables": {
-        "aws_region":         "eu-west-1",
-        "aws_build_vpc":      "",
+        "aws_region":         "us-west-2",
+        "aws_build_vpc":      "splunk",
         "aws_build_subnet":   "",
         "aws_public_ip":      "true",
         "aws_instance_type":  "t2.micro",
@@ -10,7 +10,7 @@
         "ssh_pty":            "true",
         "unique_id":          "{{           uuid  }}",
         "role":               "splunk",
-        "version":            "6.4.0",
+        "version":            "6.5.1",
         "aws_source_ami":     ""
 
     },
@@ -19,35 +19,46 @@
             "type": "amazon-ebs",
 
             "region": "{{ user `aws_region` }}",
-            "vpc_id": "{{ user `aws_build_vpc` }}",
-            "subnet_id": "{{ user `aws_build_subnet` }}",
+            "vpc_id": "vpc-a806d3cf",
+            "subnet_id": "subnet-eaa8a69c",
             "associate_public_ip_address": "{{user `aws_public_ip`}}",
             "instance_type": "{{ user `aws_instance_type` }}",
+            "access_key": "AKIAJJKPB2N34Z34AHLA",
+            "secret_key": "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",
 
             "source_ami": "{{ user `aws_source_ami` }}",
-            
+
             "ssh_username": "{{user `aws_user`}}",
-            "ssh_pty": "{{user `ssh_pty` }}",
 
             "ami_name": "{{ user `role` }}-{{ user `distribution` }}-{{ user `version` }}-{{ timestamp }}",
             "run_tags": {
                 "Name": "packer-builder-{{ user `role` }}-{{ user `distribution` }}",
                 "UUID": "{{ user `unique_id`}}"
             },
-            "tags": { "Name": "{{ user `role` }}-{{ user `distribution` }}" } 
+            "tags": { "Name": "{{ user `role` }}-{{ user `distribution` }}" }
         }
         ],
 
     "provisioners": [
         {
             "type": "file",
-            "source": "{{template_dir}}/files/splunk-{{ user `version` }}.tar.gz",
+            "source": "files/splunk-{{ user `version` }}.tar.gz",
             "destination": "/var/tmp/splunk.tar.gz"
         },
-        {   
+        {
+            "type": "file",
+            "source": "files/splunk_setup.py",
+            "destination": "/var/tmp/splunk_setup.py"
+        },
+        {
+            "type": "file",
+            "source": "files/entrypoint.sh",
+            "destination": "/var/tmp/entrypoint.sh"
+        },
+        {
             "type": "shell",
             "scripts": [
-                "{{template_dir}}/files/{{ user `distribution` }}.sh"
+                "files/{{ user `distribution` }}.sh"
             ]
         }
     ]
