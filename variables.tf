@@ -5,6 +5,8 @@ variable "instance_user" {}
 
 variable "key_name" {}
 
+variable "consul_server" {}
+
 variable "key_path" {
   description = "Path to the private key specified by key_name."
   default     = "~/.ssh/dev_key.pem"

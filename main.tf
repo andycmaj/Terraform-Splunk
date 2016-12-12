@@ -5,7 +5,7 @@ provider "aws" {
 
 # Configure the Consul provider
 provider "consul" {
-  address    = "${module.consul.server_address}:8500"
+  address    = "${var.consul_server}:8500"
   datacenter = "dc1"
 }
 
@@ -16,13 +16,6 @@ module "stack" {
   environment = "ac"
   key_name    = "${var.key_name}"
   name        = "splunk"
-}
-
-module "consul" {
-  source   = "./consul"
-  key_name = "${var.key_name}"
-  key_path = "~/.ssh/dev_key.pem"
-  servers  = 1
 }
 
 ###################### ELB PART ######################
@@ -300,11 +293,56 @@ resource "template_file" "consul_agent_install" {
   template = "${path.module}/consul/scripts/install.tpl"
 
   vars {
-    consul_params = "-advertise $${INSTANCE_IP} -retry-join=${module.consul.server_address} -data-dir=/opt/consul/data -client 0.0.0.0"
+    consul_params = "-advertise $${INSTANCE_IP} -retry-join=${var.consul_server} -data-dir=/opt/consul/data -client 0.0.0.0"
   }
 }
 
 ###################### Instances part ######################
+
+/*resource "null_resource" "consul_agent" {
+  count triggers {
+    cluster_instance_ids = "${join(",", concat(
+      aws_instance.searchhead.*.id, aws_instance.indexer.*.id, list(aws_instance.master.id, aws_instance.deploymentserver.id)
+    ))}"
+  }
+
+  connection {
+    user        = "ubuntu"
+    private_key = "${file("${var.key_path}")}"
+  }
+
+  provisioner "file" {
+    source      = "${path.module}/consul/scripts/debian_upstart.conf"
+    destination = "/tmp/upstart.conf"
+  }
+
+  provisioner "file" {
+    content     = "${template_file.consul_agent_install.rendered}"
+    destination = "/tmp/install.sh"
+  }
+
+  provisioner "remote-exec" {
+    inline = [
+      "chmod +x /tmp/install.sh",
+      "/tmp/install.sh",
+    ]
+  }
+
+  provisioner "remote-exec" {
+    scripts = [
+      "${path.module}/consul/scripts/service.sh",
+      "${path.module}/consul/scripts/ip_tables.sh",
+    ]
+  }
+
+  provisioner "remote-exec" {
+    inline = [
+      "apt-get install dnsmasq",
+      "echo \"server=/consul/127.0.0.1#8600\" > /etc/dnsmasq.d/10-consul",
+      "dig consul.service.consul",
+    ]
+  }
+}*/
 
 resource "aws_instance" "master" {
   connection {
