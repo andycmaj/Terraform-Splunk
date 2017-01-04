@@ -1,2 +1,2 @@
 [target-broker:deploymentServer]
-targetUri = deployment-server:${mgmtHostPort}
+targetUri = deployment-server.service.consul:${mgmtHostPort}

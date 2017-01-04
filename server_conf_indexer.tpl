@@ -2,5 +2,5 @@
 
 [clustering]
 mode = slave
-master_uri = https://${master_ip}:${mgmtHostPort}
+master_uri = https://cluster-master.service.consul:${mgmtHostPort}
 pass4SymmKey = ${pass4SymmKey}

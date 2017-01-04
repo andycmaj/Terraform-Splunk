@@ -124,7 +124,7 @@ def wait_splunk(uri, roles):
     """
     Wait 5 minutes for dependency
     """
-    for x in xrange(1, 300):
+    for x in xrange(1, 600):
         try:
             # This url does not require authentication, ignore certificate
             response = requests.get(uri + "/services/server/info?output_mode=json", verify=False)
@@ -191,7 +191,7 @@ def shc_autobootstrap(autobootstrap, mgmt_uri, local_user, local_password, servi
 
 
 def __service_discovery_get(service_discovery_uri, service_discovery_user, service_discovery_password, **kwargs):
-    for x in xrange(1, 300):
+    for x in xrange(1, 600):
 
         try:
             response = requests.get(service_discovery_uri,
@@ -210,7 +210,7 @@ def __service_discovery_get(service_discovery_uri, service_discovery_user, servi
 
 
 def __service_discovery_post(service_discovery_uri, service_discovery_user, service_discovery_password, **kwargs):
-    for x in xrange(1, 300):
+    for x in xrange(1, 600):
         try:
             response = requests.post(service_discovery_uri,
                                      verify=False,

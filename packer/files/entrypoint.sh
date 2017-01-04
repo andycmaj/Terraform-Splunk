@@ -2,6 +2,12 @@
 
 set -e
 
+SPLUNK_HOME=/opt/splunk
+SPLUNK_GROUP=splunk
+SPLUNK_USER=splunk
+
+env
+
 if [ "$1" = 'splunk' ]; then
   shift
   sudo -HEu ${SPLUNK_USER} ${SPLUNK_HOME}/bin/splunk "$@"
@@ -17,16 +23,7 @@ elif [ "$1" = 'start-service' ]; then
     __configured=true
   fi
 
-  __license_ok=false
-  # If these files are different override etc folder (possible that this is upgrade or first start cases)
-  # Also override ownership of these files to splunk:splunk
-  if ! $(cmp --silent /var/opt/splunk/etc/splunk.version ${SPLUNK_HOME}/etc/splunk.version); then
-    cp -fR /var/opt/splunk/etc ${SPLUNK_HOME}
-    chown -R ${SPLUNK_USER}:${SPLUNK_GROUP} ${SPLUNK_HOME}/etc
-    chown -R ${SPLUNK_USER}:${SPLUNK_GROUP} ${SPLUNK_HOME}/var
-  else
-    __license_ok=true
-  fi
+  __license_ok=true
 
   if tty -s; then
     __license_ok=true

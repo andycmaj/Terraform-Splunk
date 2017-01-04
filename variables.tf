@@ -1,3 +1,9 @@
+variable "vpc_id" {}
+
+variable "subnet_ids" {
+  default = []
+}
+
 ## AWS Specific part
 variable "ami" {}
 
@@ -18,6 +24,10 @@ variable "pretty_name" {
   default = "splunk"
 }
 
+variable env_master {
+  default = []
+}
+
 #admin cidr for ssh and web access
 variable "admin_cidr_block" {}
 
@@ -32,6 +42,10 @@ variable "instance_type_deploymentserver" {}
 variable "instance_type_master" {}
 
 variable "instance_type_searchhead" {}
+
+variable "instance_type_consul" {
+  default = "t2.micro"
+}
 
 #elb public/private setting must be set to true or false
 variable "elb_internal" {}

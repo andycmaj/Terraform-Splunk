@@ -13,4 +13,6 @@ sudo tar -zxvf /var/tmp/splunk.tar.gz
 sudo chown -R splunk:splunk /opt/splunk
 
 sudo cp /var/tmp/splunk_setup.py /opt/splunk/bin
+sudo chmod +x /opt/splunk/bin/splunk_setup.py
 sudo cp /var/tmp/entrypoint.sh /opt/splunk/bin
+sudo chmod +x /opt/splunk/bin/entrypoint.sh

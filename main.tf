@@ -5,17 +5,69 @@ provider "aws" {
 
 # Configure the Consul provider
 provider "consul" {
-  address    = "${var.consul_server}:8500"
+  address    = "${aws_instance.consul.private_ip}:8500"
   datacenter = "dc1"
 }
 
-# HACK: using stack module to generate and provide a VPC/subnets/AZs
-# TODO: find a simpler module to do this. stack generates a ton of resources
-module "stack" {
-  source      = "github.com/segmentio/stack"
-  environment = "ac"
-  key_name    = "${var.key_name}"
-  name        = "splunk"
+resource "aws_instance" "consul" {
+  ami           = "ami-b22981d2"
+  instance_type = "${var.instance_type_consul}"
+  key_name      = "${var.key_name}"
+  count         = "1"
+
+  subnet_id                   = "${element(var.subnet_ids, "0")}"
+  vpc_security_group_ids      = ["${aws_security_group.all.id}"]
+  associate_public_ip_address = true
+
+  connection {
+    user        = "ubuntu"
+    private_key = "${file("${var.key_path}")}"
+  }
+
+  #Instance tags
+  tags {
+    Name       = "consul-${count.index}"
+    ConsulRole = "Server"
+  }
+
+  provisioner "remote-exec" {
+    inline = [
+      "echo 1 > /tmp/consul-server-count",
+      "echo ${aws_instance.consul.0.private_dns} > /tmp/consul-server-addr",
+    ]
+  }
+
+  provisioner "file" {
+    source      = "${path.module}/consul/scripts/debian_upstart.conf"
+    destination = "/tmp/upstart.conf"
+  }
+
+  provisioner "file" {
+    content     = "${data.template_file.server_install.rendered}"
+    destination = "/tmp/install.sh"
+  }
+
+  provisioner "remote-exec" {
+    inline = [
+      "chmod +x /tmp/install.sh",
+      "/tmp/install.sh",
+    ]
+  }
+
+  provisioner "remote-exec" {
+    scripts = [
+      "${path.module}/consul/scripts/service.sh",
+      "${path.module}/consul/scripts/ip_tables.sh",
+    ]
+  }
+}
+
+data "template_file" "server_install" {
+  template = "${path.module}/consul/scripts/install.tpl"
+
+  vars {
+    consul_params = "-server -bootstrap-expect=$${SERVER_COUNT} -join=$${CONSUL_JOIN} -data-dir=/opt/consul/data -ui -client 0.0.0.0"
+  }
 }
 
 ###################### ELB PART ######################
@@ -27,7 +79,7 @@ resource "aws_elb" "search" {
   }
 
   internal        = "${var.elb_internal}"
-  subnets         = ["${module.stack.external_subnets}"]
+  subnets         = ["${var.subnet_ids}"]
   security_groups = ["${aws_security_group.elb.id}"]
 
   instances = ["${aws_instance.searchhead.*.id}"]
@@ -75,7 +127,7 @@ resource "aws_app_cookie_stickiness_policy" "splunk" {
 resource "aws_security_group" "elb" {
   name        = "sg_splunk_elb"
   description = "Used in the terraform"
-  vpc_id      = "${module.stack.vpc_id}"
+  vpc_id      = "${var.vpc_id}"
 
   # HTTP access from anywhere
   ingress {
@@ -105,7 +157,7 @@ resource "aws_security_group" "elb" {
 resource "aws_security_group" "all" {
   name        = "sg_splunk_all"
   description = "Common rules for all"
-  vpc_id      = "${module.stack.vpc_id}"
+  vpc_id      = "${var.vpc_id}"
 
   # Allow SSH admin access
   ingress {
@@ -130,6 +182,29 @@ resource "aws_security_group" "all" {
     protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
   }
+
+  // These are for internal traffic
+  ingress {
+    from_port = 0
+    to_port   = 65535
+    protocol  = "tcp"
+    self      = true
+  }
+
+  ingress {
+    from_port = 0
+    to_port   = 65535
+    protocol  = "udp"
+    self      = true
+  }
+
+  // Web/api access
+  ingress {
+    from_port   = 8500
+    to_port     = 8500
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
 }
 
 resource "aws_security_group_rule" "interco" {
@@ -145,7 +220,7 @@ resource "aws_security_group_rule" "interco" {
 resource "aws_security_group" "searchhead" {
   name        = "sg_splunk_searchhead"
   description = "Used in the  terraform"
-  vpc_id      = "${module.stack.vpc_id}"
+  vpc_id      = "${var.vpc_id}"
 
   #HTTP  access  from  the  ELB
   ingress {
@@ -232,13 +307,7 @@ EOF
     role                     = "master"
 
     # TODO: use provisioner remote-exec instead of this?
-    cmds_content = <<EOF
-export SPLUNK_CMD_1=cmd python /opt/splunk/bin/splunk_setup.py --wait-splunk 'https://searchhead-1:8089' '(shc_member|shc_captain)'
-export SPLUNK_CMD_2=cmd python /opt/splunk/bin/splunk_setup.py --wait-splunk 'https://searchhead-2:8089' '(shc_member|shc_captain)'
-export SPLUNK_CMD_4=add search-server searchhead-1:8089 -remoteUsername admin -remotePassword changed -auth admin:changeme
-export SPLUNK_CMD_5=add search-server searchhead-2:8089 -remoteUsername admin -remotePassword changed -auth admin:changeme
-export SPLUNK_CMD_7=status
-    EOF
+    cmds_content = "${join("\n", formatlist("export %s", var.env_master))}"
   }
 }
 
@@ -283,9 +352,14 @@ resource "template_file" "user_data_searchhead" {
     role                          = "searchhead"
 
     cmds_content = <<EOF
-export SPLUNK_CMD_1=cmd python /opt/splunk/bin/splunk_setup.py --shc-autobootstrap ${var.asg_searchhead_desired} https://$${INSTANCE_IP}:8089 admin changed 'https://cluster-master:8089/servicesNS/nobody/system/storage/collections/data/service_discovery' service_discovery_user service_discovery_password
-export SPLUNK_CMD_2=status
-    EOF
+export SPLUNK_BEFORE_START_CMD_1="version $SPLUNK_START_ARGS"
+export SPLUNK_BEFORE_START_CMD_2="cmd python /opt/splunk/bin/splunk_setup.py --wait-splunk 'https://cluster-master:8089' cluster_master kv_store"
+export SPLUNK_BEFORE_START_CMD_3="cmd python /opt/splunk/bin/splunk_setup.py --configure"
+export SPLUNK_BEFORE_START_CMD_4="edit user admin -password changed -role admin -auth admin:changeme"
+export SPLUNK_BEFORE_START_CMD_5="cmd python -c 'open("/opt/splunk/etc/.ui_login", "a").close()'"
+export SPLUNK_CMD_1="cmd python /opt/splunk/bin/splunk_setup.py --shc-autobootstrap 3 https://$HOSTNAME:8089 admin changed 'https://cluster-master:8089/servicesNS/nobody/system/storage/collections/data/service_discovery' service_discovery_user service_discovery_password"
+export SPLUNK_CMD_2="status"
+EOF
   }
 }
 
@@ -293,56 +367,11 @@ resource "template_file" "consul_agent_install" {
   template = "${path.module}/consul/scripts/install.tpl"
 
   vars {
-    consul_params = "-advertise $${INSTANCE_IP} -retry-join=${var.consul_server} -data-dir=/opt/consul/data -client 0.0.0.0"
+    consul_params = "-advertise $${INSTANCE_IP} -retry-join=${aws_instance.consul.private_ip} -data-dir=/opt/consul/data -client 0.0.0.0"
   }
 }
 
 ###################### Instances part ######################
-
-/*resource "null_resource" "consul_agent" {
-  count triggers {
-    cluster_instance_ids = "${join(",", concat(
-      aws_instance.searchhead.*.id, aws_instance.indexer.*.id, list(aws_instance.master.id, aws_instance.deploymentserver.id)
-    ))}"
-  }
-
-  connection {
-    user        = "ubuntu"
-    private_key = "${file("${var.key_path}")}"
-  }
-
-  provisioner "file" {
-    source      = "${path.module}/consul/scripts/debian_upstart.conf"
-    destination = "/tmp/upstart.conf"
-  }
-
-  provisioner "file" {
-    content     = "${template_file.consul_agent_install.rendered}"
-    destination = "/tmp/install.sh"
-  }
-
-  provisioner "remote-exec" {
-    inline = [
-      "chmod +x /tmp/install.sh",
-      "/tmp/install.sh",
-    ]
-  }
-
-  provisioner "remote-exec" {
-    scripts = [
-      "${path.module}/consul/scripts/service.sh",
-      "${path.module}/consul/scripts/ip_tables.sh",
-    ]
-  }
-
-  provisioner "remote-exec" {
-    inline = [
-      "apt-get install dnsmasq",
-      "echo \"server=/consul/127.0.0.1#8600\" > /etc/dnsmasq.d/10-consul",
-      "dig consul.service.consul",
-    ]
-  }
-}*/
 
 resource "aws_instance" "master" {
   connection {
@@ -363,7 +392,7 @@ resource "aws_instance" "master" {
   provisioner "remote-exec" {
     inline = [
       "chmod +x /tmp/install.sh",
-      "/tmp/install.sh",
+      "/tmp/install.sh cluster-master",
     ]
   }
 
@@ -371,14 +400,6 @@ resource "aws_instance" "master" {
     scripts = [
       "${path.module}/consul/scripts/service.sh",
       "${path.module}/consul/scripts/ip_tables.sh",
-    ]
-  }
-
-  provisioner "remote-exec" {
-    inline = [
-      "apt-get install dnsmasq",
-      "echo \"server=/consul/127.0.0.1#8600\" > /etc/dnsmasq.d/10-consul",
-      "dig consul.service.consul",
     ]
   }
 
@@ -391,18 +412,13 @@ resource "aws_instance" "master" {
     delete_on_termination = true
   }
 
-  ami                    = "${var.ami}"
-  instance_type          = "${var.instance_type_indexer}"
-  key_name               = "${var.key_name}"
-  subnet_id              = "${element(module.stack.external_subnets, "0")}"
-  user_data              = "${template_file.user_data_master.rendered}"
-  vpc_security_group_ids = ["${aws_security_group.all.id}"]
-}
-
-resource "consul_service" "master" {
-  address = "${aws_instance.master.private_ip}"
-  name    = "cluster-master"
-  port    = 8089
+  ami                         = "${var.ami}"
+  instance_type               = "${var.instance_type_indexer}"
+  key_name                    = "${var.key_name}"
+  subnet_id                   = "${element(var.subnet_ids, "0")}"
+  user_data                   = "${template_file.user_data_master.rendered}"
+  vpc_security_group_ids      = ["${aws_security_group.all.id}"]
+  associate_public_ip_address = true
 }
 
 resource "aws_instance" "deploymentserver" {
@@ -424,7 +440,7 @@ resource "aws_instance" "deploymentserver" {
   provisioner "remote-exec" {
     inline = [
       "chmod +x /tmp/install.sh",
-      "/tmp/install.sh",
+      "/tmp/install.sh deployment-server",
     ]
   }
 
@@ -432,14 +448,6 @@ resource "aws_instance" "deploymentserver" {
     scripts = [
       "${path.module}/consul/scripts/service.sh",
       "${path.module}/consul/scripts/ip_tables.sh",
-    ]
-  }
-
-  provisioner "remote-exec" {
-    inline = [
-      "apt-get install dnsmasq",
-      "echo \"server=/consul/127.0.0.1#8600\" > /etc/dnsmasq.d/10-consul",
-      "dig consul.service.consul",
     ]
   }
 
@@ -452,19 +460,14 @@ resource "aws_instance" "deploymentserver" {
     delete_on_termination = true
   }
 
-  ami                    = "${var.ami}"
-  instance_type          = "${var.instance_type_indexer}"
-  key_name               = "${var.key_name}"
-  private_ip             = "${var.deploymentserver_ip}"
-  subnet_id              = "${element(module.stack.external_subnets, "0")}"
-  user_data              = "${template_file.user_data_deploymentserver.rendered}"
-  vpc_security_group_ids = ["${aws_security_group.all.id}"]
-}
-
-resource "consul_service" "deploymentserver" {
-  address = "${aws_instance.deploymentserver.private_ip}"
-  name    = "deployment-server"
-  port    = 8089
+  ami                         = "${var.ami}"
+  instance_type               = "${var.instance_type_indexer}"
+  key_name                    = "${var.key_name}"
+  private_ip                  = "${var.deploymentserver_ip}"
+  subnet_id                   = "${element(var.subnet_ids, "0")}"
+  user_data                   = "${template_file.user_data_deploymentserver.rendered}"
+  vpc_security_group_ids      = ["${aws_security_group.all.id}"]
+  associate_public_ip_address = true
 }
 
 resource "aws_instance" "indexer" {
@@ -488,7 +491,7 @@ resource "aws_instance" "indexer" {
   provisioner "remote-exec" {
     inline = [
       "chmod +x /tmp/install.sh",
-      "/tmp/install.sh",
+      "/tmp/install.sh indexer-${count.index}",
     ]
   }
 
@@ -496,14 +499,6 @@ resource "aws_instance" "indexer" {
     scripts = [
       "${path.module}/consul/scripts/service.sh",
       "${path.module}/consul/scripts/ip_tables.sh",
-    ]
-  }
-
-  provisioner "remote-exec" {
-    inline = [
-      "apt-get install dnsmasq",
-      "echo \"server=/consul/127.0.0.1#8600\" > /etc/dnsmasq.d/10-consul",
-      "dig consul.service.consul",
     ]
   }
 
@@ -516,20 +511,13 @@ resource "aws_instance" "indexer" {
     delete_on_termination = true
   }
 
-  ami                    = "${var.ami}"
-  instance_type          = "${var.instance_type_indexer}"
-  key_name               = "${var.key_name}"
-  subnet_id              = "${element(module.stack.external_subnets, count.index)}"
-  user_data              = "${template_file.user_data_indexer.rendered}"
-  vpc_security_group_ids = ["${aws_security_group.all.id}"]
-}
-
-resource "consul_service" "indexer" {
-  count = "${var.count_indexer}"
-
-  address = "${element(aws_instance.indexer.*.private_ip, count.index)}"
-  name    = "indexer-${count.index}"
-  port    = 8089
+  ami                         = "${var.ami}"
+  instance_type               = "${var.instance_type_indexer}"
+  key_name                    = "${var.key_name}"
+  subnet_id                   = "${element(var.subnet_ids, count.index)}"
+  user_data                   = "${template_file.user_data_indexer.rendered}"
+  vpc_security_group_ids      = ["${aws_security_group.all.id}"]
+  associate_public_ip_address = true
 }
 
 resource "aws_instance" "searchhead" {
@@ -553,7 +541,7 @@ resource "aws_instance" "searchhead" {
   provisioner "remote-exec" {
     inline = [
       "chmod +x /tmp/install.sh",
-      "/tmp/install.sh",
+      "/tmp/install.sh search-head-${count.index}",
     ]
   }
 
@@ -564,35 +552,24 @@ resource "aws_instance" "searchhead" {
     ]
   }
 
-  provisioner "remote-exec" {
-    inline = [
-      "apt-get install dnsmasq",
-      "echo \"server=/consul/127.0.0.1#8600\" > /etc/dnsmasq.d/10-consul",
-      "dig consul.service.consul",
-    ]
-  }
-
   tags {
     Name = "splunk_searchhead"
   }
 
   root_block_device {
-    volume_size           = 1000
+    volume_size           = 500
     delete_on_termination = true
   }
 
-  ami                    = "${var.ami}"
-  instance_type          = "${var.instance_type_searchhead}"
-  key_name               = "${var.key_name}"
-  subnet_id              = "${element(module.stack.external_subnets, count.index)}"
-  user_data              = "${template_file.user_data_searchhead.rendered}"
-  vpc_security_group_ids = ["${aws_security_group.all.id}"]
+  ami                         = "${var.ami}"
+  instance_type               = "${var.instance_type_searchhead}"
+  key_name                    = "${var.key_name}"
+  subnet_id                   = "${element(var.subnet_ids, count.index)}"
+  user_data                   = "${template_file.user_data_searchhead.rendered}"
+  vpc_security_group_ids      = ["${aws_security_group.all.id}"]
+  associate_public_ip_address = true
 }
 
-resource "consul_service" "searchhead" {
-  count = "${var.asg_searchhead_desired}"
-
-  address = "${element(aws_instance.searchhead.*.private_ip, count.index)}"
-  name    = "searchhead-${count.index}"
-  port    = 8089
+output "master_ip" {
+  value = "${aws_instance.master.public_ip}"
 }

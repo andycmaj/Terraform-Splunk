@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 set -e
 
+SERVICE_NAME=$1
+
 echo "Installing dependencies..."
 if [ -x "$(command -v apt-get)" ]; then
   sudo apt-get update -y
@@ -9,7 +11,6 @@ else
   sudo yum update -y
   sudo yum install -y unzip wget
 fi
-
 
 echo "Fetching Consul..."
 CONSUL=0.7.1
@@ -26,6 +27,8 @@ sudo mkdir -p /opt/consul/data
 SERVER_COUNT=$(cat /tmp/consul-server-count | tr -d '\n')
 CONSUL_JOIN=$(cat /tmp/consul-server-addr | tr -d '\n')
 
+INSTANCE_IP="$(curl http://169.254.169.254/latest/meta-data/local-ipv4)"
+
 # Write the flags to a temporary file
 cat >/tmp/consul_flags << EOF
 CONSUL_FLAGS="${consul_params}"
@@ -35,6 +38,14 @@ if [ -f /tmp/upstart.conf ];
 then
   echo "Installing Upstart service..."
   sudo mkdir -p /etc/consul.d
+
+  if [ ! -z "$SERVICE_NAME" ]; then
+    sudo mkdir -p /etc/dnsmasq.d
+    sudo echo "server=/consul/127.0.0.1#8600" | sudo tee /etc/dnsmasq.d/10-consul
+    sudo apt-get install -y dnsmasq
+    sudo echo '{"service": {"name": "'"$SERVICE_NAME"'", "port": 8089}}' | sudo tee /etc/consul.d/cluster-master.json
+  fi
+
   sudo mkdir -p /etc/service
   sudo chown root:root /tmp/upstart.conf
   sudo mv /tmp/upstart.conf /etc/init/consul.conf
